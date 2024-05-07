@@ -1,13 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:alva_chat_app/main.dart';
+import 'package:alva_chat_app/src/ignore_me/mandelbrot_related.dart';
 import 'package:alva_chat_app/src/rust/frb_generated.dart';
 import 'package:integration_test/integration_test.dart';
 
-void main() {
+Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async => await RustLib.init());
-  testWidgets('Can call rust function', (WidgetTester tester) async {
+
+  testWidgets('can see page', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
-    expect(find.textContaining('Result: `Hello, Tom!`'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.byType(MandelbrotPageUI), findsOneWidget);
   });
 }
