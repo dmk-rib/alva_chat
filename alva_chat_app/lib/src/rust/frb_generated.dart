@@ -3,7 +3,8 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/mandelbrot.dart';
+import 'api/conversation.dart';
+import 'api/llama_model.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.io.dart' if (dart.library.html) 'frb_generated.web.dart';
@@ -54,7 +55,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.0.0-dev.33';
 
   @override
-  int get rustContentHash => 1921755045;
+  int get rustContentHash => -1169809768;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -65,12 +66,9 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<Uint8List> drawMandelbrot(
-      {required Size imageSize,
-      required Point zoomPoint,
-      required double scale,
-      required int numThreads,
-      dynamic hint});
+  Future<Conversation> conversationNew({dynamic hint});
+
+  Future<void> loadModel({required String modelPath, dynamic hint});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -82,43 +80,53 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<Uint8List> drawMandelbrot(
-      {required Size imageSize,
-      required Point zoomPoint,
-      required double scale,
-      required int numThreads,
-      dynamic hint}) {
+  Future<Conversation> conversationNew({dynamic hint}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_size(imageSize, serializer);
-        sse_encode_box_autoadd_point(zoomPoint, serializer);
-        sse_encode_f_64(scale, serializer);
-        sse_encode_i_32(numThreads, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 1, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_prim_u_8_strict,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData: sse_decode_conversation,
+        decodeErrorData: null,
       ),
-      constMeta: kDrawMandelbrotConstMeta,
-      argValues: [imageSize, zoomPoint, scale, numThreads],
+      constMeta: kConversationNewConstMeta,
+      argValues: [],
       apiImpl: this,
       hint: hint,
     ));
   }
 
-  TaskConstMeta get kDrawMandelbrotConstMeta => const TaskConstMeta(
-        debugName: "draw_mandelbrot",
-        argNames: ["imageSize", "zoomPoint", "scale", "numThreads"],
+  TaskConstMeta get kConversationNewConstMeta => const TaskConstMeta(
+        debugName: "conversation_new",
+        argNames: [],
       );
 
-  @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AnyhowException(raw as String);
+  @override
+  Future<void> loadModel({required String modelPath, dynamic hint}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(modelPath, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 2, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kLoadModelConstMeta,
+      argValues: [modelPath],
+      apiImpl: this,
+      hint: hint,
+    ));
   }
+
+  TaskConstMeta get kLoadModelConstMeta => const TaskConstMeta(
+        debugName: "load_model",
+        argNames: ["modelPath"],
+      );
 
   @protected
   String dco_decode_String(dynamic raw) {
@@ -127,27 +135,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Point dco_decode_box_autoadd_point(dynamic raw) {
+  bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_point(raw);
+    return raw as bool;
   }
 
   @protected
-  Size dco_decode_box_autoadd_size(dynamic raw) {
+  Conversation dco_decode_conversation(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_size(raw);
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return Conversation(
+      messages: dco_decode_list_message(arr[0]),
+    );
   }
 
   @protected
-  double dco_decode_f_64(dynamic raw) {
+  List<Message> dco_decode_list_message(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as double;
-  }
-
-  @protected
-  int dco_decode_i_32(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as int;
+    return (raw as List<dynamic>).map(dco_decode_message).toList();
   }
 
   @protected
@@ -157,26 +164,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Point dco_decode_point(dynamic raw) {
+  Message dco_decode_message(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return Point(
-      x: dco_decode_f_64(arr[0]),
-      y: dco_decode_f_64(arr[1]),
-    );
-  }
-
-  @protected
-  Size dco_decode_size(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return Size(
-      width: dco_decode_i_32(arr[0]),
-      height: dco_decode_i_32(arr[1]),
+    return Message(
+      user: dco_decode_bool(arr[0]),
+      text: dco_decode_String(arr[1]),
     );
   }
 
@@ -187,10 +182,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_String(deserializer);
-    return AnyhowException(inner);
+  void dco_decode_unit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return;
   }
 
   @protected
@@ -201,27 +195,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Point sse_decode_box_autoadd_point(SseDeserializer deserializer) {
+  bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_point(deserializer));
+    return deserializer.buffer.getUint8() != 0;
   }
 
   @protected
-  Size sse_decode_box_autoadd_size(SseDeserializer deserializer) {
+  Conversation sse_decode_conversation(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_size(deserializer));
+    var var_messages = sse_decode_list_message(deserializer);
+    return Conversation(messages: var_messages);
   }
 
   @protected
-  double sse_decode_f_64(SseDeserializer deserializer) {
+  List<Message> sse_decode_list_message(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getFloat64();
-  }
 
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getInt32();
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Message>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_message(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -232,19 +227,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Point sse_decode_point(SseDeserializer deserializer) {
+  Message sse_decode_message(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_x = sse_decode_f_64(deserializer);
-    var var_y = sse_decode_f_64(deserializer);
-    return Point(x: var_x, y: var_y);
-  }
-
-  @protected
-  Size sse_decode_size(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_width = sse_decode_i_32(deserializer);
-    var var_height = sse_decode_i_32(deserializer);
-    return Size(width: var_width, height: var_height);
+    var var_user = sse_decode_bool(deserializer);
+    var var_text = sse_decode_String(deserializer);
+    return Message(user: var_user, text: var_text);
   }
 
   @protected
@@ -254,16 +241,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
+  void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
   }
 
   @protected
-  void sse_encode_AnyhowException(
-      AnyhowException self, SseSerializer serializer) {
+  int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
+    return deserializer.buffer.getInt32();
   }
 
   @protected
@@ -273,27 +258,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_point(Point self, SseSerializer serializer) {
+  void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_point(self, serializer);
+    serializer.buffer.putUint8(self ? 1 : 0);
   }
 
   @protected
-  void sse_encode_box_autoadd_size(Size self, SseSerializer serializer) {
+  void sse_encode_conversation(Conversation self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_size(self, serializer);
+    sse_encode_list_message(self.messages, serializer);
   }
 
   @protected
-  void sse_encode_f_64(double self, SseSerializer serializer) {
+  void sse_encode_list_message(List<Message> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putFloat64(self);
-  }
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putInt32(self);
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_message(item, serializer);
+    }
   }
 
   @protected
@@ -305,17 +287,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_point(Point self, SseSerializer serializer) {
+  void sse_encode_message(Message self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_f_64(self.x, serializer);
-    sse_encode_f_64(self.y, serializer);
-  }
-
-  @protected
-  void sse_encode_size(Size self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.width, serializer);
-    sse_encode_i_32(self.height, serializer);
+    sse_encode_bool(self.user, serializer);
+    sse_encode_String(self.text, serializer);
   }
 
   @protected
@@ -325,8 +300,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
+  void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
   }
 }

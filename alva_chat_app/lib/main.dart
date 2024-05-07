@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:alva_chat_app/src/examples/mandelbrot.dart';
 import 'package:alva_chat_app/src/rust/frb_generated.dart';
+
+import 'src/ui/chat_page.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -19,8 +20,8 @@ class MyApp extends StatelessWidget {
           primary: Colors.blue,
         ),
       ),
-      home: const Scaffold(
-        body: MandelbrotPageBody(),
+      home: Scaffold(
+        body: ChatPage(),
       ),
     );
   }

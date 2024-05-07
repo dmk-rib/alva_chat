@@ -31,7 +31,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.0.0-dev.33";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1921755045;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1169809768;
 
 // Section: executor
 
@@ -39,15 +39,15 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
-fn wire_draw_mandelbrot_impl(
+fn wire_conversation_new_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "draw_mandelbrot",
+            debug_name: "conversation_new",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -61,37 +61,49 @@ fn wire_draw_mandelbrot_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_image_size = <crate::api::mandelbrot::Size>::sse_decode(&mut deserializer);
-            let api_zoom_point = <crate::api::mandelbrot::Point>::sse_decode(&mut deserializer);
-            let api_scale = <f64>::sse_decode(&mut deserializer);
-            let api_num_threads = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
-            move |context| async move {
-                transform_result_sse(
-                    (move || async move {
-                        crate::api::mandelbrot::draw_mandelbrot(
-                            api_image_size,
-                            api_zoom_point,
-                            api_scale,
-                            api_num_threads,
-                        )
-                        .await
-                    })()
-                    .await,
+            move |context| {
+                transform_result_sse((move || {
+                    Result::<_, ()>::Ok(crate::api::conversation::Conversation::new())
+                })())
+            }
+        },
+    )
+}
+fn wire_load_model_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "load_model",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
                 )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_model_path = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse((move || {
+                    Result::<_, ()>::Ok(crate::api::llama_model::load_model(&api_model_path))
+                })())
             }
         },
     )
 }
 
 // Section: dart2rust
-
-impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        unreachable!("");
-    }
-}
 
 impl SseDecode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -101,17 +113,34 @@ impl SseDecode for String {
     }
 }
 
-impl SseDecode for f64 {
+impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_f64::<NativeEndian>().unwrap()
+        deserializer.cursor.read_u8().unwrap() != 0
     }
 }
 
-impl SseDecode for i32 {
+impl SseDecode for crate::api::conversation::Conversation {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+        let mut var_messages = <Vec<crate::api::conversation::Message>>::sse_decode(deserializer);
+        return crate::api::conversation::Conversation {
+            messages: var_messages,
+        };
+    }
+}
+
+impl SseDecode for Vec<crate::api::conversation::Message> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::conversation::Message>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
     }
 }
 
@@ -127,23 +156,14 @@ impl SseDecode for Vec<u8> {
     }
 }
 
-impl SseDecode for crate::api::mandelbrot::Point {
+impl SseDecode for crate::api::conversation::Message {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_x = <f64>::sse_decode(deserializer);
-        let mut var_y = <f64>::sse_decode(deserializer);
-        return crate::api::mandelbrot::Point { x: var_x, y: var_y };
-    }
-}
-
-impl SseDecode for crate::api::mandelbrot::Size {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_width = <i32>::sse_decode(deserializer);
-        let mut var_height = <i32>::sse_decode(deserializer);
-        return crate::api::mandelbrot::Size {
-            width: var_width,
-            height: var_height,
+        let mut var_user = <bool>::sse_decode(deserializer);
+        let mut var_text = <String>::sse_decode(deserializer);
+        return crate::api::conversation::Message {
+            user: var_user,
+            text: var_text,
         };
     }
 }
@@ -155,10 +175,15 @@ impl SseDecode for u8 {
     }
 }
 
-impl SseDecode for bool {
+impl SseDecode for () {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {}
+}
+
+impl SseDecode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_u8().unwrap() != 0
+        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
     }
 }
 
@@ -171,7 +196,8 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire_draw_mandelbrot_impl(port, ptr, rust_vec_len, data_len),
+        1 => wire_conversation_new_impl(port, ptr, rust_vec_len, data_len),
+        2 => wire_load_model_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -191,46 +217,41 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::mandelbrot::Point {
+impl flutter_rust_bridge::IntoDart for crate::api::conversation::Conversation {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.x.into_into_dart().into_dart(),
-            self.y.into_into_dart().into_dart(),
-        ]
-        .into_dart()
+        [self.messages.into_into_dart().into_dart()].into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::mandelbrot::Point {}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::mandelbrot::Point>
-    for crate::api::mandelbrot::Point
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::conversation::Conversation
 {
-    fn into_into_dart(self) -> crate::api::mandelbrot::Point {
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::conversation::Conversation>
+    for crate::api::conversation::Conversation
+{
+    fn into_into_dart(self) -> crate::api::conversation::Conversation {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::mandelbrot::Size {
+impl flutter_rust_bridge::IntoDart for crate::api::conversation::Message {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.width.into_into_dart().into_dart(),
-            self.height.into_into_dart().into_dart(),
+            self.user.into_into_dart().into_dart(),
+            self.text.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::mandelbrot::Size {}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::mandelbrot::Size>
-    for crate::api::mandelbrot::Size
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::conversation::Message
 {
-    fn into_into_dart(self) -> crate::api::mandelbrot::Size {
-        self
-    }
 }
-
-impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(format!("{:?}", self), serializer);
+impl flutter_rust_bridge::IntoIntoDart<crate::api::conversation::Message>
+    for crate::api::conversation::Message
+{
+    fn into_into_dart(self) -> crate::api::conversation::Message {
+        self
     }
 }
 
@@ -241,17 +262,27 @@ impl SseEncode for String {
     }
 }
 
-impl SseEncode for f64 {
+impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_f64::<NativeEndian>(self).unwrap();
+        serializer.cursor.write_u8(self as _).unwrap();
     }
 }
 
-impl SseEncode for i32 {
+impl SseEncode for crate::api::conversation::Conversation {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+        <Vec<crate::api::conversation::Message>>::sse_encode(self.messages, serializer);
+    }
+}
+
+impl SseEncode for Vec<crate::api::conversation::Message> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::conversation::Message>::sse_encode(item, serializer);
+        }
     }
 }
 
@@ -265,19 +296,11 @@ impl SseEncode for Vec<u8> {
     }
 }
 
-impl SseEncode for crate::api::mandelbrot::Point {
+impl SseEncode for crate::api::conversation::Message {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <f64>::sse_encode(self.x, serializer);
-        <f64>::sse_encode(self.y, serializer);
-    }
-}
-
-impl SseEncode for crate::api::mandelbrot::Size {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.width, serializer);
-        <i32>::sse_encode(self.height, serializer);
+        <bool>::sse_encode(self.user, serializer);
+        <String>::sse_encode(self.text, serializer);
     }
 }
 
@@ -288,10 +311,15 @@ impl SseEncode for u8 {
     }
 }
 
-impl SseEncode for bool {
+impl SseEncode for () {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+}
+
+impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_u8(self as _).unwrap();
+        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
     }
 }
 
