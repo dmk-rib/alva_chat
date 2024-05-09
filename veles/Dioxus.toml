@@ -4,7 +4,7 @@
 name = "veles"
 
 # Dioxus App Default Platform
-# desktop, web
+# desktop, web, mobile, ssr
 default_platform = "web"
 
 # `build` & `serve` dist path
@@ -24,20 +24,23 @@ title = "veles"
 reload_html = true
 
 # which files or dirs will be watcher monitoring
-watch_path = ["src", "assets"]
+watch_path = ["src", "public"]
 
 # include `assets` in web platform
 [web.resource]
 
 # CSS style file
-
-style = ["tailwind.css"]
+style = []
 
 # Javascript code file
 script = []
 
 [web.resource.dev]
 
-# Javascript code file
 # serve: [dev-server] only
+
+# CSS style file
+style = []
+
+# Javascript code file
 script = []
