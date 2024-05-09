@@ -10,13 +10,13 @@ default_platform = "web"
 # `build` & `serve` dist path
 out_dir = "dist"
 
-# resource (assets) file folder
-asset_dir = "assets"
+# resource (public) file folder
+asset_dir = "public"
 
 [web.app]
 
 # HTML title tag content
-title = "veles"
+title = "Veles"
 
 [web.watcher]
 

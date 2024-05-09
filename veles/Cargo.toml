@@ -3,27 +3,33 @@ name = "veles"
 version = "0.1.0"
 authors = ["Dmytro Kravchyna <dmytro.kravchyna@rib-software.com>"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# description = "A tailwindcss example using Dioxus"
+# license = "MIT OR Apache-2.0"
+# repository = "https://github.com/DioxusLabs/dioxus/"
+# homepage = "https://dioxuslabs.com"
+# documentation = "https://dioxuslabs.com"
+# rust-version = "1.60.0"
+# publish = false
 
 [dependencies]
 serde = { version = "1.0.201", features = ["derive"] }
-manganis = "0.2.2"
+# manganis = "0.2.1"
+# manganis = { git = "https://github.com/DioxusLabs/collect-assets.git", branch = "master" }
+manganis = { version = "0.2.2" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-# dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["desktop", "router" ] }
-dioxus = { version = "0.5.1", features = ["desktop", "router"] }
+dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["desktop" ] }
+# dioxus = { version = "0.5.1", features = ["desktop", "router"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-# dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["fullstack", "router"] } 
-# dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["web", "router"] } 
-dioxus = { version = "0.5.1", features = ["web", "router"] }
+dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["web", "router"] }
+# dioxus = { version = "0.5.1", features = ["web", "router"] }
 
 # Debug
 tracing = "0.1.40"
-dioxus-logger = "0.5.0"
+# dioxus-logger = "0.5.0"
 
-[features]
-default = []
-server = ["dioxus/axum"]
-web = ["dioxus/web"]
+# [features]
+# default = []
+# server = ["dioxus/axum"]
+# web = ["dioxus/web"]
