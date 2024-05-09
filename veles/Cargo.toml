@@ -27,7 +27,7 @@ dioxus = { version = "0.5.1", features = ["web", "router"] }
 
 # Debug
 tracing = "0.1.40"
-# dioxus-logger = "0.5.0"
+dioxus-logger = "0.5.0"
 
 # [features]
 # default = []
