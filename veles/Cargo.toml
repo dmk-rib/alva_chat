@@ -18,12 +18,12 @@ serde = { version = "1.0.201", features = ["derive"] }
 manganis = { version = "0.2.2" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["desktop" ] }
-# dioxus = { version = "0.5.1", features = ["desktop", "router"] }
+# dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["desktop" ] }
+dioxus = { version = "0.5.1", features = ["desktop", "router"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["web", "router"] }
-# dioxus = { version = "0.5.1", features = ["web", "router"] }
+# dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", branch = "main", features = ["web", "router"] }
+dioxus = { version = "0.5.1", features = ["web", "router"] }
 
 # Debug
 tracing = "0.1.40"
