@@ -8,8 +8,12 @@ edition = "2021"
 
 [dependencies]
 serde = { version = "1.0.197", features = ["derive"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 manganis = { version = "0.2.2" }
 dioxus = { version = "0.5", features = ["fullstack", "router"] }
+
+# cached = "0.51.3"
+reqwest = { version = "0.12.4", features = ["json"] }
 
 # Debug
 tracing = "0.1.40"

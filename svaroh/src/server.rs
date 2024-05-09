@@ -1,4 +1,3 @@
-
 use dioxus::prelude::*;
 use tracing::{info, Level};
 
@@ -12,4 +11,3 @@ pub async fn post_server_data(data: String) -> Result<(), ServerFnError> {
 pub async fn get_server_data() -> Result<String, ServerFnError> {
     Ok("Hello from the server!".to_string())
 }
- 
