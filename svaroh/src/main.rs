@@ -1,14 +1,11 @@
- 
-
 use dioxus::prelude::*;
-use components::{item_detailed::Product, home::Home, not_found::PageNotFound, nav_bar::NavBar};
+use components::{chat::Chat, home::Home, not_found::PageNotFound, nav_bar::NavBar};
 
 mod components { 
     pub mod home;
-    pub mod error;
     pub mod nav_bar;
     pub mod not_found;
-    pub mod item_detailed;
+    pub mod chat;
 }
 mod api;
 mod server;
@@ -22,11 +19,20 @@ pub enum Route {
     #[layout(NavBar)]
         #[route("/")]
         Home {},
-        #[route("/details/:id")] //details/1
-        Product { id: u32 },
     #[end_layout]
+    #[route("/chat/:..term")] //details/1
+    Chat { term: Vec<String> },
     #[route("/:..route")]
     PageNotFound { route: Vec<String> },
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct DarkMode(bool);
+
+impl DarkMode {
+    pub fn prefix(&self) -> &str {
+       if self.0 { "drak:" } else { "" } 
+    }
 }
 
 
@@ -35,11 +41,13 @@ fn main() {
 
     // Init logger
     dioxus_logger::init(Level::INFO).expect("failed to init logger");
-    dioxus::launch(app);
+    dioxus::launch(App);
 }
 
-
-fn app() -> Element {
+#[component]
+fn App() -> Element {
+    use_context_provider(|| Signal::new(DarkMode(false)));
+    
     rsx! {
         Router::<Route> {}
     }
