@@ -6,7 +6,9 @@ pub fn NavBar() -> Element {
     let dark_mode = use_context::<Signal<DarkMode>>();
     
     rsx! {
-        header { class: "flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full bg-white text-sm py-3 md:py-0 {dark_mode().prefix()}bg-neutral-800",
+        header {
+            class: "flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full text-sm py-3 md:py-0",
+            class: if dark_mode().0 { "bg-neutral-800" } else { "bg-white" },
             nav {
                 aria_label: "Global",
                 class: "max-w-[85rem] w-full mx-auto px-4 md:px-6 lg:px-8",
@@ -15,7 +17,8 @@ pub fn NavBar() -> Element {
                         Link { to: Route::Home {} ,
                             a {
                                 aria_label: "Svaroh",
-                                class: "flex-none text-xl font-semibold {dark_mode().prefix()}text-white",
+                                class: "flex-none text-xl font-semibold",
+                                class: if dark_mode().0 { "text-white" },
                                 "Svaroh"
                             }
                         }
@@ -25,7 +28,8 @@ pub fn NavBar() -> Element {
                                 aria_label: "Toggle navigation",
                                 r#type: "button",
                                 "data-hs-collapse": "#navbar-collapse-with-animation",
-                                class: "hs-collapse-toggle flex justify-center items-center size-9 text-sm font-semibold rounded-lg border border-gray-200 text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none {dark_mode().prefix()}text-white {dark_mode().prefix()}border-neutral-700 {dark_mode().prefix()}hover:bg-neutral-700",
+                                class: "hs-collapse-toggle flex justify-center items-center size-9 text-sm font-semibold rounded-lg border border-gray-200 text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none",
+                                class: if dark_mode().0 { "text-white border-neutral-700 hover:bg-neutral-700" },
                                 svg {
                                     fill: "none",
                                     stroke_linecap: "round",
@@ -77,20 +81,25 @@ pub fn NavBar() -> Element {
                         class: "hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block",
                         //class: "transition-all duration-300 basis-full grow md:block",
                         id: "navbar-collapse-with-animation",
-                        div { class: "overflow-hidden overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 {dark_mode().prefix()}[&::-webkit-scrollbar-track]:bg-neutral-700 {dark_mode().prefix()}[&::-webkit-scrollbar-thumb]:bg-neutral-500",
-                            div { class: "flex flex-col gap-x-0 mt-5 divide-y divide-dashed divide-gray-200 md:flex-row md:items-center md:justify-end md:gap-x-7 md:mt-0 md:ps-7 md:divide-y-0 md:divide-solid {dark_mode().prefix()}divide-neutral-700",
+                        div { 
+                            class: "overflow-hidden overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300",
+                            class: if dark_mode().0 { "[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar-thumb]:bg-neutral-500" },
+                            div { 
+                                class: "flex flex-col gap-x-0 mt-5 divide-y divide-dashed md:flex-row md:items-center md:justify-end md:gap-x-7 md:mt-0 md:ps-7 md:divide-y-0 md:divide-solid",
+                                class: if dark_mode().0 { "divide-neutral-700" } else { "divide-gray-200" },
                                 Link { to: Route::Chat { term: vec![] } ,
                                     a {
                                         aria_current: "page",
-                                        href: "#",
-                                        class: "font-medium text-blue-600 py-3 md:py-6 {dark_mode().prefix()}text-blue-500",
+                                        class: "font-medium py-3 md:py-6",
+                                        class: if dark_mode().0 { "text-blue-500" } else { "text-blue-600" },
                                         "Chat"
                                     }
                                 }
                                 div { class: "hs-dropdown [--strategy:static] md:[--strategy:absolute] [--adaptive:none] md:[--trigger:hover] py-3 md:py-6",
                                     button {
                                         r#type: "button",
-                                        class: "flex items-center w-full text-gray-800 hover:text-gray-600 font-medium {dark_mode().prefix()}text-neutral-200 {dark_mode().prefix()}hover:text-neutral-500",
+                                        class: "flex items-center w-full font-medium",
+                                        class: if dark_mode().0 { "text-neutral-200 hover:text-neutral-500" } else { "text-gray-800 hover:text-gray-600" },
                                         "\n                Company\n                "
                                         svg {
                                             width: "16",
@@ -107,10 +116,13 @@ pub fn NavBar() -> Element {
                                             }
                                         }
                                     }
-                                    div { class: "hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] md:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 md:w-80 hidden z-10 bg-white md:shadow-2xl rounded-lg py-2 md:p-2 {dark_mode().prefix()}bg-neutral-800 {dark_mode().prefix()}divide-neutral-700 before:absolute top-full before:-top-5 before:start-0 before:w-full before:h-5",
+                                    div { 
+                                        class: "hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] md:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 md:w-80 hidden z-10  md:shadow-2xl rounded-lg py-2 md:p-2  before:absolute top-full before:-top-5 before:start-0 before:w-full before:h-5",
+                                        class: if dark_mode().0 { "bg-neutral-800 divide-neutral-700" } else { "bg-white" },
                                         a {
                                             href: "#",
-                                            class: "inline-flex gap-x-5 w-full p-4 text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 {dark_mode().prefix()}text-neutral-400 {dark_mode().prefix()}hover:bg-neutral-700 {dark_mode().prefix()}hover:text-neutral-300",
+                                            class: "inline-flex gap-x-5 w-full p-4 rounded-lg focus:ring-2 focus:ring-blue-500",
+                                            class: if dark_mode().0 { "text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300" } else { "text-gray-600 hover:bg-gray-100" },
                                             svg {
                                                 width: "24",
                                                 stroke_linecap: "round",
@@ -143,16 +155,22 @@ pub fn NavBar() -> Element {
                                                 }
                                             }
                                             div { class: "grow",
-                                                span { class: "block font-semibold mb-1 text-gray-800 {dark_mode().prefix()}text-neutral-200",
+                                                span { 
+                                                    class: "block font-semibold mb-1",
+                                                    class: if dark_mode().0 { "text-neutral-200" } else { "text-gray-800" },
                                                     "Data"
                                                 }
                                                 "\n                    How you get the most accurate and up-to-date data\n                  "
                                             }
                                         }
-                                        div { class: "my-2 border-t border-gray-100 {dark_mode().prefix()}border-neutral-800" }
+                                        div { 
+                                            class: "my-2 border-t",
+                                            class: if dark_mode().0 { "border-neutral-800" } else { "border-gray-100" },
+                                        },
                                         a {
                                             href: "#",
-                                            class: "inline-flex gap-x-5 w-full p-4 text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 {dark_mode().prefix()}text-neutral-400 {dark_mode().prefix()}hover:bg-neutral-700 {dark_mode().prefix()}hover:text-neutral-300",
+                                            class: "inline-flex gap-x-5 w-full p-4 rounded-lg focus:ring-2 focus:ring-blue-500",
+                                            class: if dark_mode().0 { "text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300" } else { "text-gray-600 hover:bg-gray-100" },
                                             svg {
                                                 stroke_width: "2",
                                                 stroke_linecap: "round",
@@ -174,7 +192,9 @@ pub fn NavBar() -> Element {
                                                 path { d: "M16 3.13a4 4 0 0 1 0 7.75" }
                                             }
                                             div { class: "grow",
-                                                span { class: "block font-semibold mb-1 text-gray-800 {dark_mode().prefix()}text-neutral-200",
+                                                span { 
+                                                    class: "block font-semibold mb-1",
+                                                    class: if dark_mode().0 { "text-neutral-200" } else { "text-gray-800" },
                                                     "Team "
                                                     span { class: "inline ms-1 text-xs bg-blue-600 text-white py-1 px-2 rounded-full",
                                                         "We're hiring"
@@ -183,10 +203,14 @@ pub fn NavBar() -> Element {
                                                 "\n                    Meet the people building products to help your business grow\n                  "
                                             }
                                         }
-                                        div { class: "my-2 border-t border-gray-100 {dark_mode().prefix()}border-neutral-800" }
+                                        div { 
+                                            class: "my-2 border-t",
+                                            class: if dark_mode().0 { "border-neutral-800" } else { "border-gray-100" } 
+                                        }
                                         a {
                                             href: "#",
-                                            class: "inline-flex gap-x-5 w-full p-4 text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 {dark_mode().prefix()}text-neutral-400 {dark_mode().prefix()}hover:bg-neutral-700 {dark_mode().prefix()}hover:text-neutral-300",
+                                            class: "inline-flex gap-x-5 w-full p-4 rounded-lg focus:ring-2 focus:ring-blue-500",
+                                            class: if dark_mode().0 { "text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300" } else { "text-gray-600 hover:bg-gray-100" },
                                             svg {
                                                 view_box: "0 0 24 24",
                                                 width: "24",
@@ -204,7 +228,9 @@ pub fn NavBar() -> Element {
                                                 path { d: "M10 6h8v4h-8V6Z" }
                                             }
                                             div { class: "grow",
-                                                span { class: "block font-semibold mb-1 text-gray-800 {dark_mode().prefix()}text-neutral-200",
+                                                span { 
+                                                    class: "block font-semibold mb-1",
+                                                    class: if dark_mode().0 { "text-neutral-200" } else { "text-gray-800" },
                                                     "Blog"
                                                 }
                                                 "\n                    The latest news, feature releases, and how to grow with data\n                  "
@@ -214,12 +240,14 @@ pub fn NavBar() -> Element {
                                 }
                                 a {
                                     href: "#",
-                                    class: "font-medium text-gray-800 hover:text-gray-600 py-3 md:py-6 {dark_mode().prefix()}text-neutral-200 {dark_mode().prefix()}hover:text-neutral-500",
+                                    class: "font-medium py-3 md:py-6",
+                                    class: if dark_mode().0 { "text-neutral-200 hover:text-neutral-500" } else { "text-gray-800 hover:text-gray-600" },
                                     "\n              Resources\n            "
                                 }
                                 a {
                                     href: "#",
-                                    class: "font-medium text-gray-800 hover:text-gray-600 py-3 md:py-6 {dark_mode().prefix()}text-neutral-200 {dark_mode().prefix()}hover:text-neutral-500",
+                                    class: "font-medium py-3 md:py-6",
+                                    class: if dark_mode().0 { "text-neutral-200 hover:text-neutral-500" } else { "text-gray-800 hover:text-gray-600" },
                                     "\n              Join us "
                                     span { class: "py-0.5 px-1.5 rounded-full text-xs font-medium bg-blue-50 border border-blue-200 text-blue-600",
                                         "4"
@@ -255,7 +283,8 @@ mod icons {
             rsx!{
                 button {
                     r#type: "button",
-                    class: "block group flex items-center text-gray-600 hover:text-blue-600 font-medium {dark_mode().prefix()}text-neutral-400 {dark_mode().prefix()}hover:text-neutral-500",
+                    class: "block group flex items-center font-medium",
+                    class: if dark_mode().0 { "text-neutral-400 hover:text-neutral-500" } else { "text-gray-600 hover:text-blue-600" },
                     onclick: move |_| dark_mode.set(DarkMode(false)),
                     svg {
                         stroke: "currentColor",
@@ -285,7 +314,8 @@ mod icons {
             rsx! {
                 button {
                     r#type: "button",
-                    class: "block group flex items-center text-gray-600 hover:text-blue-600 font-medium {dark_mode().prefix()}text-neutral-400 {dark_mode().prefix()}hover:text-neutral-500",
+                    class: "block group flex items-center font-medium",
+                    class: if dark_mode().0 { "text-neutral-400 hover:text-neutral-500" } else { "text-gray-600 hover:text-blue-600" },
                     onclick: move |_| dark_mode.set(DarkMode(true)),
                     svg {
                         view_box: "0 0 24 24",
