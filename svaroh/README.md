@@ -14,3 +14,9 @@ Launch the Dioxus Fullstack app:
 ```bash
 dx serve --platform fullstack
 ```
+
+Launch the Dioxus Web app:
+
+```bash
+dx serve --platform web
+```

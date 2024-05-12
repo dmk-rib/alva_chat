@@ -1,11 +1,11 @@
+use components::{chat::Chat, home::Home, nav_bar::NavBar, not_found::PageNotFound};
 use dioxus::prelude::*;
-use components::{chat::Chat, home::Home, not_found::PageNotFound, nav_bar::NavBar};
 
-mod components { 
+mod components {
+    pub mod chat;
     pub mod home;
     pub mod nav_bar;
     pub mod not_found;
-    pub mod chat;
 }
 mod api;
 mod server;
@@ -31,10 +31,13 @@ pub struct DarkMode(bool);
 
 impl DarkMode {
     pub fn prefix(&self) -> &str {
-       if self.0 { "drak:" } else { "" } 
+        if self.0 {
+            "drak:"
+        } else {
+            ""
+        }
     }
 }
-
 
 fn main() {
     use tracing::Level;
@@ -47,7 +50,7 @@ fn main() {
 #[component]
 fn App() -> Element {
     use_context_provider(|| Signal::new(DarkMode(false)));
-    
+
     rsx! {
         Router::<Route> {}
     }

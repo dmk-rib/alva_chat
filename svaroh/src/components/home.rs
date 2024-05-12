@@ -1,4 +1,4 @@
-use crate::{ api::*, Route };
+use crate::{api::*, Route};
 use dioxus::prelude::*;
 
 #[component]
@@ -127,8 +127,6 @@ mod icons {
         }
     }
 }
-
-
 
 // #[component]
 // pub fn Home() -> Element {

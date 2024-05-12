@@ -1,7 +1,7 @@
-use std::{ str::FromStr, fmt::Display };
+use std::{fmt::Display, str::FromStr};
 
+use crate::{api::*, Route};
 use dioxus::prelude::*;
-use crate::{ api::*, Route };
 
 #[component]
 pub fn Chat(term: Vec<String>) -> Element {
@@ -2232,7 +2232,6 @@ pub fn Chat(term: Vec<String>) -> Element {
     }
 }
 
-
 mod icons {
     use super::*;
 
@@ -2274,7 +2273,6 @@ mod icons {
         }
     }
 }
-
 
 // #[derive(Default)]
 // enum Size {

@@ -1,10 +1,10 @@
 #![allow(unused)]
 
-use std::fmt::Display;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
-#[derive(Clone, Debug,  Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub(crate) struct Product {
     pub(crate) id: u32,
     pub(crate) title: String,
